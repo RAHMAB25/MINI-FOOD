@@ -1,14 +1,16 @@
-
 'use client';
-
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+
 
 export default function PageVerification() {
+  const router = useRouter();
   const [mail, setMail] = useState('');
   const [motpas, setMotpas] = useState('');
-  const [message, setMessage] = useState('');
+  
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -23,13 +25,16 @@ export default function PageVerification() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('Connexion réussie (:');
+       toast.success('Connexion réussie (:');
+        router.push('/register');
       } else {
-        setMessage(data.message || 'Échec de la connexion');
+        toast.success(data.message || 'Échec de la connexion');
+        router.push('/contact');
+
       }
     } catch (error) {
       console.error('Erreur réseau :', error);
-      setMessage('donner non exacte !');
+      setMessage('Données incorrectes ou serveur indisponible');
     }
   };
 
@@ -62,8 +67,14 @@ export default function PageVerification() {
         </div>
 
         <button type="submit" className="btn btn-primary">Connexion</button>
-        {message && <p className="mt-3 text-danger">{message}</p>}
+        {message && (
+          <p className={`mt-3 ${message.includes('réussie') ? 'text-success' : 'text-danger'}`}>
+            {message}
+          </p>
+        )}
       </form>
+      <ToastContainer />
+
     </div>
   );
 }

@@ -2,11 +2,11 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+
+
 export default function Page1() {
  const router = useRouter();
 
-
-  // test
   const [non, setNon] = useState('');
   const [adre, setAdre] = useState('');
   const [tep, setTep] = useState('');
@@ -79,6 +79,8 @@ export default function Page1() {
 
         <button type="submit" className="btn btn-primary">Envoyer</button>
       </form>
+      
+
     </div>
   );
 }
