@@ -10,14 +10,13 @@ export default function Page1() {
   const [non, setNon] = useState('');
   const [adre, setAdre] = useState('');
   const [tep, setTep] = useState('');
-  const [mail, setMail] = useState('');
-  const [motpas, setMotpas] = useState('');
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const body = { non, adre, tep, mail, motpas };
+      const body = { non, adre, tep};
       const response = await fetch("http://localhost:3002/adduser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -31,13 +30,13 @@ export default function Page1() {
       setNon("");
       setAdre("");
       setTep("");
-      setMail("");
-      setMotpas("");
+      
+      router.push('/');
+      
     } catch (err) {
       console.error(err);
     }
-
-     router.push('regiter/page');
+      
   };
 
   return (
@@ -74,28 +73,6 @@ export default function Page1() {
             id="tep"
             value={tep}
             onChange={(e) => setTep(e.target.value)}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="mail" className="form-label">Email</label>
-          <input
-            type="email"
-            className="form-control"
-            id="mail"
-            value={mail}
-            onChange={(e) => setMail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="motpas" className="form-label">Mot de passe</label>
-          <input
-            type="password"
-            className="form-control"
-            id="motpas"
-            value={motpas}
-            onChange={(e) => setMotpas(e.target.value)}
             required
           />
         </div>
