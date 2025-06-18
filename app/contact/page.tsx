@@ -3,18 +3,19 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Page1() {
- const router = useRouter();
+  const router = useRouter();
 
   const [non, setNon] = useState('');
   const [adre, setAdre] = useState('');
   const [tep, setTep] = useState('');
-
+  const [mail, setMail] = useState('');
+  const [motpas, setMotpas] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const body = { non, adre, tep};
+      const body = { non, adre, tep, mail, motpas };
       const response = await fetch("http://localhost:3002/adduser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -25,16 +26,16 @@ export default function Page1() {
       console.log(result);
 
       // Réinitialiser les champs
-      setNon("");
-      setAdre("");
-      setTep("");
-      
-      router.push('/');
-      
+      setNon('');
+      setAdre('');
+      setTep('');
+      setMail('');
+      setMotpas('');
+
+      router.push('/'); 
     } catch (err) {
       console.error(err);
     }
-      
   };
 
   return (
@@ -52,6 +53,7 @@ export default function Page1() {
             required
           />
         </div>
+
         <div className="mb-3">
           <label htmlFor="adre" className="form-label">Adresse</label>
           <input
@@ -63,6 +65,7 @@ export default function Page1() {
             required
           />
         </div>
+
         <div className="mb-3">
           <label htmlFor="tep" className="form-label">Téléphone</label>
           <input
@@ -75,10 +78,32 @@ export default function Page1() {
           />
         </div>
 
+        <div className="mb-3">
+          <label htmlFor="mail" className="form-label">Email</label>
+          <input
+            type="email"
+            className="form-control"
+            id="mail"
+            value={mail}
+            onChange={(e) => setMail(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="mb-3">
+          <label htmlFor="motpas" className="form-label">Mot de passe</label>
+          <input
+            type="password"
+            className="form-control"
+            id="motpas"
+            value={motpas}
+            onChange={(e) => setMotpas(e.target.value)}
+            required
+          />
+        </div>
+
         <button type="submit" className="btn btn-primary">Envoyer</button>
       </form>
-      
-
     </div>
   );
 }

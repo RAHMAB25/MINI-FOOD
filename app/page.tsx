@@ -34,7 +34,10 @@ export default function PageVerification() {
       } else {
         toast.error(data.message || 'Échec de la connexion ❌');
         setTimeout(() => {
-          router.push('/contact');
+          
+                  setMail("");
+                  setMotpas("");
+      
         }, 2000);
         
       }
@@ -73,11 +76,26 @@ export default function PageVerification() {
         </div>
 
         <button type="submit" className="btn btn-primary">Connexion</button>
+
+        <button
+  type="button"
+  className="btn btn-success mt-3"
+  onClick={() => router.push('/enregistrement')}
+>
+  Enregistrer
+</button>
+
+        
+        
       </form>
 
       <ToastContainer  
       position="top-right" autoClose={2500}
        />
     </div>
+
+
+       
+    
   );
 }
