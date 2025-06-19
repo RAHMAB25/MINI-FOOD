@@ -25,10 +25,12 @@ export default function PageVerification() {
       const data = await response.json();
 
       if (response.ok) {
+        console.log("" ,response)
+         localStorage.setItem("user", JSON.stringify(data.user));
         toast.success('Connexion réussie ! 🎉');
         
         setTimeout(() => {
-           router.push('/register');
+           router.push('/home');
         }, 2000); 
         
       } else {
@@ -58,7 +60,7 @@ export default function PageVerification() {
             className="form-control"
             id="mail"
             value={mail}
-            onChange={(e) => setMail(e.target.value)}
+             onChange={(e) => setMail(e.target.value.toLowerCase())}
             required
           />
         </div>
@@ -76,6 +78,7 @@ export default function PageVerification() {
         </div>
 
         <button type="submit" className="btn btn-primary">Connexion</button>
+        <br></br> <br></br>
 
         <button
   type="button"
