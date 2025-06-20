@@ -60,7 +60,7 @@ export default function PageVerification() {
             className="form-control"
             id="mail"
             value={mail}
-             onChange={(e) => setMail(e.target.value.toLowerCase())}
+            onChange={(e) => setMail(e.target.value)}
             required
           />
         </div>
