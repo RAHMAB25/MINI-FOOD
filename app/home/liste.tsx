@@ -13,14 +13,24 @@ type Reservation = {
 
 export default function Liste() {
   const [reservation, setReservation] = useState<Reservation[]>([]);
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(false);// HATHI   variable jdida
   const [editId, setEditId] = useState<number | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
 
   const [nom, setNom] = useState('');
   const [dated, setDated] = useState('');
   const [message, setMessage] = useState('');
 
-  // Charger les données
+ 
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setUserId(user.id);
+    }
+  }, []);
+
+  // get
   const getReservation = async () => {
     try {
       const res = await fetch('http://localhost:3002/reservation');
@@ -69,47 +79,52 @@ export default function Liste() {
   };
 
   const handleSave = async () => {
-    try {
-      const body = { nom, dated };
-      const url = editMode
-        ? `http://localhost:3002/reservation/${editId}`
-        : `http://localhost:3002/reserver`;
+    if (!userId) {
+      setMessage("Utilisateur non connecté");
+      return;
+    }
 
-      const method = editMode ? 'PUT' : 'POST';
+    const body = {
+      nom,
+      dated,
+      user_id: userId,
+    };
 
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+    const url = editMode
+      ? `http://localhost:3002/reservation/${editId}` // PUT
+      : `http://localhost:3002/reserver`;             // POST
 
-      if (response.ok) {
-        setMessage(editMode ? 'Réservation modifiée !' : 'Réservation enregistrée !');
-        setNom('');
-        setDated('');
-        setEditMode(false);
-        setEditId(null);
-        getReservation(); // recharge la liste
-      } else {
-        setMessage("Erreur lors de l’enregistrement");
-      }
-    } catch (error) {
-      console.error(error);
-      setMessage("Erreur réseau");
+    const method = editMode ? 'PUT' : 'POST';
+
+    const response = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) {
+      await getReservation(); // Recharge à partir du backend
+      setNom('');
+      setDated('');
+      setEditMode(false);
+      setEditId(null);
+      setMessage(editMode ? 'Réservation modifiée !' : 'Réservation enregistrée !');
+    } else {
+      setMessage("Erreur lors de l’enregistrement");
     }
   };
 
   return (
     <div className="container">
-      <div className='d-flex justify-content-between mp-3'>
-        <h2 className="text-xl font-bold mb-4">Réservation</h2>
+      <div className='d-flex justify-content-between mb-3'>
+        <h2 className="text-xl font-bold">Réservation</h2>
         <button
           type="button"
           className="btn btn-primary"
           data-bs-toggle="modal"
           data-bs-target="#reservationModal"
           onClick={() => {
-            setEditMode(false);
+            setEditMode(false); // Passage en mode ajout
             setNom('');
             setDated('');
             setMessage('');
@@ -135,7 +150,7 @@ export default function Liste() {
           <div className="col-md-4 mb-4" key={r.id}>
             <div className="card h-100 shadow-sm">
               <div className="card-body">
-                <h5 className="card-title">cadre de reservation</h5>
+                <h5 className="card-title">Cadre de réservation</h5>
                 <p className="card-text"><strong>Nom :</strong> {r.nom}</p>
                 <p className="card-text"><strong>Date début :</strong> {formatDate(r.dated)}</p>
                 <p className="card-text"><strong>Date fin :</strong> {formatDate(r.datef)}</p>
@@ -152,4 +167,3 @@ export default function Liste() {
     </div>
   );
 }
-

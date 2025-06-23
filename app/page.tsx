@@ -34,7 +34,7 @@ export default function PageVerification() {
         }, 2000); 
         
       } else {
-        toast.error(data.message || 'Échec de la connexion ❌');
+        toast.error(data.message || 'Échec de la connexion ');
         setTimeout(() => {
           
                   setMail("");

@@ -1,42 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 
 type ModalReservationProps = {
-
-reservation :any ,
-  setReservation:Function
+  nom: string;
+  setNom: (val: string) => void;
+  dated: string;
+  setDated: (val: string) => void;
+  message: string;
+  handleSave: () => void;
 };
 
-export default function ModalReservation({reservation ,setReservation} :ModalReservationProps) {
-      const [message, setMessage] = useState('');
-    
-      const [nom, setNom] = useState('');
-      const [dated, setDated] = useState('');
-
-      const handleSave = async () => {
-    try {
-      const body = { nom, dated };
-      const response = await fetch('http://localhost:3002/reserver', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-
-      const data = await response.json();
-      setMessage('Réservation ajoutée avec succès');
-      setNom('');
-      setDated('');
-
-      // Recharge les réservations
-      let datareservation :any =reservation
-      datareservation.push(data)
-      setReservation(datareservation);
-    } catch (err) {
-      console.error(err);
-      setMessage("Erreur lors de l'ajout");
-    }
-  };
+export default function ModalReservation({
+  nom,
+  setNom,
+  dated,
+  setDated,
+  message,
+  handleSave,
+}: ModalReservationProps) {
   return (
     <div
       className="modal fade"
@@ -51,7 +33,7 @@ export default function ModalReservation({reservation ,setReservation} :ModalRes
           {/* En-tête */}
           <div className="modal-header">
             <h5 className="modal-title" id="reservationModalLabel">
-              Ajouter Réservation
+              {nom ? "Modifier Réservation" : "Ajouter Réservation"}
             </h5>
             <button
               type="button"
