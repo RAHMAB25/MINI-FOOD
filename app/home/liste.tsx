@@ -124,7 +124,7 @@ export default function Liste() {
           data-bs-toggle="modal"
           data-bs-target="#reservationModal"
           onClick={() => {
-            setEditMode(false); // Passage en mode ajout
+            setEditMode(false);
             setNom('');
             setDated('');
             setMessage('');

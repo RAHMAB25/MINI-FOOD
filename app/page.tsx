@@ -30,7 +30,13 @@ export default function PageVerification() {
         toast.success('Connexion réussie ! 🎉');
         
         setTimeout(() => {
-           router.push('/home');
+          if(data.user.admin){
+             router.push('/admin');
+          }
+          else  {
+ router.push('/home');
+          }
+          
         }, 2000); 
         
       } else {
