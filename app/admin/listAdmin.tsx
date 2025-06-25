@@ -6,105 +6,59 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button';
 import ModalAjout from './modalAjout';
 
-
-
-
-type Reservation = {
+type ReservationWithUser = {
   id: number;
   nom: string;
   dated: string;
   datef: string;
   etat: string;
   user_id: number;
-};
-
-type User = {
-  id: number;
-  non: string;
+  usernom: string;
   adre: string;
   tep: string;
   mail: string;
-  bloqué: boolean;
 };
 
 export default function ListAdmin() {
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [data, setData] = useState<any>({});
-  const [options, setOptions] = useState<{ [key: number]: string }>({});
-   const [showModal, setShowModal] = useState(false)
-
-
-
+  const [reservations, setReservations] = useState<ReservationWithUser[]>([]);
+  const [data, setData] = useState<ReservationWithUser | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const [show, setShow] = useState(false);
 
-const handleClose = () => setShow(false);
-const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
-
-
-const handleEtatChange = (etat: string) => {
-  setData((prev: any) => ({
-    ...prev,
-    etat: etat,
-  }));
-};
-
-// enregistrer l etat bl put 
-const handleSaveEtat = async () => {
-  if (!data?.id) return;
-
-  try {
-    await fetch(`http://localhost:3002/reservation/${data.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ etat: data.etat }),
-    });
-
-    alert(`État de la réservation ${data.id} mis à jour à ${data.etat}`);
-    setShow(false);
-
-    const res1 = await fetch('http://localhost:3002/reservation');
-    const reservationsData = await res1.json();
-    setReservations(reservationsData);
-
-  } catch (err) {
-    console.error('Erreur mise à jour:', err);
-  }
-};
-
-  
-
-  const handleOptionChange = (reservationId: number, value: string) => {
-    setOptions((prev) => ({ ...prev, [reservationId]: value }));
+  const handleEtatChange = (etat: string) => {
+    setData((prev) => prev ? { ...prev, etat } : null);
   };
 
-  const handleSubmit = async (e: React.FormEvent, reservationId: number) => {
-    e.preventDefault();
-    const selected = options[reservationId] || 'aucune';
+  const handleSaveEtat = async () => {
+    if (!data?.id) return;
 
     try {
-      await fetch(`http://localhost:3002/reservation/${reservationId}`, {
+      await fetch(`http://localhost:3002/reservation/${data.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ etat: selected }),
+        body: JSON.stringify({ etat: data.etat }),
       });
-      alert(`Réservation ${reservationId} mise à jour avec option ${selected}`);
+
+      setShow(false);
+
+      const res = await fetch('http://localhost:3002/nvreservation');
+      const updated = await res.json();
+      setReservations(updated);
+
     } catch (err) {
-      console.error('Erreur mise à jour:', err);
+      console.error('Erreur mise à jour :', err);
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res1 = await fetch('http://localhost:3002/reservation');
-        const reservationsData = await res1.json();
-        setReservations(reservationsData);
-
-        const res2 = await fetch('http://localhost:3002/users');
-        const usersData = await res2.json();
-        setUsers(Array.isArray(usersData) ? usersData : []);
+        const res = await fetch('http://localhost:3002/nvreservation');
+        const data = await res.json();
+        setReservations(data);
       } catch (err) {
         console.error(err);
       }
@@ -137,69 +91,52 @@ const handleSaveEtat = async () => {
 
       <div className="container position-relative py-5" style={{ zIndex: 1 }}>
         <h2 className="text-white mb-4">Réservations</h2>
-      <>
-      <Button onClick={() => setShowModal(true)}>AJOUTER USER</Button>
-      <ModalAjout
-        show={showModal}
-        handleClose={() => setShowModal(false)}
-        onUserAdded={() => {
-          setShowModal(false);
-        }}
-      />
-      
-    </>
 
-<div className="row">
+        <Button onClick={() => setShowModal(true)}>AJOUTER USER</Button>
+        <ModalAjout
+          show={showModal}
+          handleClose={() => setShowModal(false)}
+          onUserAdded={() => setShowModal(false)}
+        />
 
-          {reservations.map((r) => {
-            const user = users.find((u) => u.id === r.user_id);
-            const modalId = `optionModal-${r.id}`;
-            return (
-              <div className="col-md-4 mb-4" key={r.id}>
-                <div className="card h-100 shadow">
-                  <div className="card-body text-dark">
-                    <h5 className="card-title">Réservation</h5>
-                    <p><strong>Nom :</strong> {r.nom}</p>
-                    <p><strong>Début :</strong> {formatDate(r.dated)}</p>
-                    <p><strong>Fin :</strong> {formatDate(r.datef)}</p>
-                    <p><strong>État :</strong> {r.etat === '1' ? 'Acceptée' : r.etat === '2' ? 'Refusée' : 'En attente'}</p>
-
-                    {user && (
-                      <>
-                        <p><strong>Adresse :</strong> {user.adre}</p>
-                        <p><strong>Téléphone :</strong> {user.tep}</p>
-                        <p><strong>Email :</strong> {user.mail}</p>
-                        <p><strong>Bloqué :</strong> {user.bloqué ? 'Oui' : 'Non'}</p>
-                        
-                      </>
-                    )}
-
-               
-                  </div>
-                     <Button
-        type="button"
-    
-         onClick={ ()=>{
-          setData(r)
-          handleShow()}}
-      >
-        Choix d'état
-      </Button>
+        <div className="row mt-4">
+          {reservations.map((r) => (
+            <div key={r.id} className="col-md-4 mb-4">
+              <div className="card h-100 shadow">
+                <div className="card-body text-dark">
+                  <h5 className="card-title">Réservation</h5>
+                  <p><strong>Nom :</strong> {r.nom}</p>
+                  <p><strong> DATE Début :</strong> {formatDate(r.dated)}</p>
+                  <p><strong> DATE Fin :</strong> {formatDate(r.datef)}</p>
+                  <p><strong>État :</strong> {r.etat === '1' ? 'Acceptée' : r.etat === '2' ? 'Refusée' : 'En attente'}</p>
+                  <p><strong>Nom utilisateur :</strong> {r.usernom}</p>
+                  <p><strong>Email :</strong> {r.mail}</p>
+                  <p><strong>Téléphone :</strong> {r.tep}</p>
+                  <p><strong>Adresse :</strong> {r.adre}</p>
+                  <Button
+                    type="button"
+                    className="mt-2"
+                    onClick={() => {
+                      setData(r);
+                      handleShow();
+                    }}
+                  >
+                    Choix d'état
+                  </Button>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
 
-<ModalAdmin  
-  handleClose={handleClose}
-  show={show}
-  Data={data}
-  onEtatChange={handleEtatChange}
-  onSave={handleSaveEtat}
-/>
-
+      <ModalAdmin
+        handleClose={handleClose}
+        show={show}
+        Data={data}
+        onEtatChange={handleEtatChange}
+        onSave={handleSaveEtat}
+      />
     </div>
   );
 }
